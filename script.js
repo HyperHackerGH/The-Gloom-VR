@@ -22,6 +22,7 @@ console.log(maze, (endspot[1] / (maze.length - 1)) * 94 - 47, (endspot[0] / (maz
 
 var started = false
 var locked = false
+var done = false
 
 var cposx = 0
 var cposy = 0
@@ -98,7 +99,7 @@ document.addEventListener("keydown", keydown, false)
 document.addEventListener("keyup", keyup, false)
 
 document.body.addEventListener("click", function() {
-    controls.lock()
+    if (!done) {controls.lock()}
     if (!started) {
         begintime = performance.now()
         started = true
@@ -108,6 +109,45 @@ document.body.addEventListener("click", function() {
     }
 }, false)
  // slow down enemy attack
+const floor = new THREE.Mesh(
+    new THREE.BoxGeometry(100, 1, 100),
+    new THREE.MeshStandardMaterial({color: 0xf0f0f0})
+)
+
+floor.position.y = -2
+
+scene.add(floor)
+
+const b = new THREE.Mesh(
+    new THREE.BoxGeometry(4, 2, 4),
+    new THREE.MeshLambertMaterial({color: 0x00ff00})
+)
+
+b.position.x = (endspot[1] / (maze.length - 1)) * 94 - 47
+b.position.z = (endspot[0] / (maze[0].length - 1)) * 94 - 47
+
+scene.add(b)
+
+function end(outcome) {
+    controls.unlock()
+    done = true
+
+    var donetime = performance.now() - begintime
+    var minutes = Math.floor(donetime / 60000)
+    var seconds = ((donetime % 60000) / 1000).toFixed(0)
+
+    if (outcome == "win") {
+        document.getElementById("endtexth").innerHTML = "You have escaped The Gloom."
+        document.getElementById("endtime").innerHTML = `Time: ${minutes}m ${seconds}s`
+    }
+    else {
+        document.getElementById("endtexth").innerHTML = "You have failed to escape The Gloom."
+        document.getElementById("endtime").innerHTML = `Time: ${minutes}m ${seconds}s`
+    }
+
+    document.getElementById("end").style.display = "block"
+}
+
 function update() {
     if (controls.isLocked == true) {
         var time = performance.now()
@@ -145,6 +185,14 @@ function update() {
             })
         })
 
+        if (Math.abs(controls.getObject().position.x - b.position.x) < 2.2 && Math.abs(controls.getObject().position.z - b.position.z) < 2.2) {
+            controls.getObject().position.copy(lastpos)
+
+            velocity.x = 0
+            velocity.z = 0
+            end("win")
+        }
+
         if (controls.getObject().position.y < 0) {
             velocity.y = 0
             controls.getObject().position.y = 0
@@ -153,25 +201,6 @@ function update() {
         lasttime = time
     }
 }
-
-const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(100, 1, 100),
-    new THREE.MeshStandardMaterial({color: 0xf0f0f0})
-)
-
-floor.position.y = -2
-
-scene.add(floor)
-
-const b = new THREE.Mesh(
-    new THREE.BoxGeometry(4, 2, 4),
-    new THREE.MeshLambertMaterial({color: 0x00ff00})
-)
-
-b.position.x = (endspot[1] / (maze.length - 1)) * 94 - 47
-b.position.z = (endspot[0] / (maze[0].length - 1)) * 94 - 47
-
-scene.add(b)
 
 maze.forEach((v, i) => {
     v.forEach((j, k) => {
@@ -201,11 +230,11 @@ window.addEventListener("resize", () => {
 })
 
 function gameloop() {
-    if (started) {
+    if (started && !done) {
         const timer = document.getElementById("time")
 
         timer.style.display = "block"
-        
+
         var donetime = performance.now() - begintime
         var minutes = Math.floor(donetime / 60000)
         var seconds = ((donetime % 60000) / 1000).toFixed(0)
