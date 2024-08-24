@@ -54,44 +54,48 @@ scene.add(controls.getObject())
 const cbox = new THREE.Box3().setFromObject(controls.getObject())
 
 var keydown = function(e) {
-    switch (e.keyCode) {
-        case 38:
-        case 87: 
-            moveforward = true
-            break
-        case 37: 
-        case 65:
-            moveleft = true
-            break
-        case 40:
-        case 83:
-            movebackward = true
-            break
-        case 39: 
-        case 68: 
-            moveright = true
-            break
+    if (started) {
+        switch (e.keyCode) {
+            case 38:
+            case 87: 
+                moveforward = true
+                break
+            case 37: 
+            case 65:
+                moveleft = true
+                break
+            case 40:
+            case 83:
+                movebackward = true
+                break
+            case 39: 
+            case 68: 
+                moveright = true
+                break
+        }
     }
 }
 
 var keyup = function(e) {
-    switch (e.keyCode) {
-        case 38:
-        case 87:
-            moveforward = false
-            break
-        case 37:
-        case 65:
-            moveleft = false
-            break
-        case 40:
-        case 83:
-            movebackward = false
-            break
-        case 39:
-        case 68:
-            moveright = false
-            break
+    if (started) {
+        switch (e.keyCode) {
+            case 38:
+            case 87:
+                moveforward = false
+                break
+            case 37:
+            case 65:
+                moveleft = false
+                break
+            case 40:
+            case 83:
+                movebackward = false
+                break
+            case 39:
+            case 68:
+                moveright = false
+                break
+        }
     }
 }
 
@@ -135,17 +139,14 @@ function end(outcome) {
     var donetime = performance.now() - begintime
     var minutes = Math.floor(donetime / 60000)
     var seconds = ((donetime % 60000) / 1000).toFixed(0)
+    
+    document.getElementById("endtime").innerHTML = `Time: ${minutes}m ${seconds}s`
 
-    if (outcome == "win") {
-        document.getElementById("endtexth").innerHTML = "You have escaped The Gloom."
-        document.getElementById("endtime").innerHTML = `Time: ${minutes}m ${seconds}s`
-    }
-    else {
-        document.getElementById("endtexth").innerHTML = "You have failed to escape The Gloom."
-        document.getElementById("endtime").innerHTML = `Time: ${minutes}m ${seconds}s`
-    }
+    if (outcome == "win") {document.getElementById("endtexth").innerHTML = "You have escaped The Gloom."}
+    else {document.getElementById("endtexth").innerHTML = "You have failed to escape The Gloom."}
 
     document.getElementById("end").style.display = "block"
+    setTimeout(() => {document.getElementsByTagName("canvas")[0].remove()}, 1500)
 }
 
 function update() {
