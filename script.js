@@ -168,7 +168,7 @@ else if (v > 0 && v < 0.8) {moveforward = true}
         lookleft = false
     }
 
-    //timer.innerHTML = `${lookright}, ${lookleft}`
+    //timer.innerHTML = `${lookright},${lookleft}`
 
     // timer.innerHTML = `${gamma.toFixed(0)}, ${alpha.toFixed(0)}`
 }
